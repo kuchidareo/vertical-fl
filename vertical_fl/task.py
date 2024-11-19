@@ -6,8 +6,10 @@ import pandas as pd
 import torch.nn as nn
 from flwr.common.logger import log
 
-from datasets import Dataset
+from datasets import Dataset, load_dataset
 from flwr_datasets.partitioner import IidPartitioner
+from torchvision.transforms import Compose, Normalize, Resize, ToTensor, RandomHorizontalFlip, RandomVerticalFlip, RandomAffine
+
 
 NUM_VERTICAL_SPLITS = 3
 
@@ -107,6 +109,40 @@ def load_data(partition_id: int, num_partitions: int):
 
     return partition.to_pandas(), v_split_id
 
+def load_trashnet():
+    dataset = load_dataset("kuchidareo/small_trashnet")
+    dataset = dataset.with_format("torch")
+
+    if "test" not in dataset.keys():
+        if "train" in dataset.keys():
+            dataset = dataset["train"].train_test_split(test_size=0.2)
+        else:
+            dataset = dataset.train_test_split(test_size=0.2)
+    
+    image_key = "image"
+    label_key = "label"
+
+    transform = Compose([
+        ToTensor(),
+        RandomHorizontalFlip(),
+        RandomVerticalFlip(),
+        RandomAffine(degrees=0,
+                    translate=(0.1, 0.1),
+                    scale=(0.9, 1.1),
+                    shear=10),
+        Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        Resize((300, 300))
+    ])
+    def apply_transform(data):
+        if image_key not in data:
+            return data
+        data[image_key] = [transform(img) for img in data[image_key]]
+        return data
+
+    trainsets = dataset["train"].with_transform(apply_transform)
+    testsets = dataset["test"].with_transform(apply_transform)
+    return trainsets, testsets
+
 
 def _partition_data_vertically(df, all_keywords):
     partitions = []
@@ -128,12 +164,3 @@ def _partition_data_vertically(df, all_keywords):
         )
 
     return partitions
-
-
-class ClientModel(nn.Module):
-    def __init__(self, input_size):
-        super().__init__()
-        self.fc = nn.Linear(input_size, 4)
-
-    def forward(self, x):
-        return self.fc(x)

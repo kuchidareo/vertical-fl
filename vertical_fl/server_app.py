@@ -2,18 +2,16 @@ from flwr.common import Context
 from flwr.server import ServerApp, ServerAppComponents, ServerConfig
 
 from vertical_fl.strategy import Strategy
-from vertical_fl.task import process_dataset
+from vertical_fl.task import load_trashnet
 
 
 def server_fn(context: Context) -> ServerAppComponents:
     """Construct components that set the ServerApp behaviour."""
 
-    # Get dataset
-    processed_df, _ = process_dataset()
-    print(processed_df)
-
+    trainsets, valsets = load_trashnet()
+    train_label, test_label = trainsets["label"], valsets["label"]
     # Define the strategy
-    strategy = Strategy(processed_df["Survived"].values)
+    strategy = Strategy(train_label, test_label)
 
     # Construct ServerConfig
     num_rounds = context.run_config["num-server-rounds"]
