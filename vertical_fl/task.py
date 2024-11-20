@@ -110,7 +110,7 @@ def load_data(partition_id: int, num_partitions: int):
     return partition.to_pandas(), v_split_id
 
 def load_trashnet():
-    dataset = load_dataset("kuchidareo/small_trashnet")
+    dataset = load_dataset("kuchidareo/small_trashnet", split="train[:5%]")
     dataset = dataset.with_format("torch")
 
     if "test" not in dataset.keys():
@@ -138,8 +138,13 @@ def load_trashnet():
             return data
         data[image_key] = [transform(img) for img in data[image_key]]
         return data
+<<<<<<< HEAD
     trainsets = dataset["train"].with_transform(apply_transform).shuffle(seed=42).slice(0, len(dataset["train"]) // 10)
     testsets = dataset["test"].with_transform(apply_transform).shuffle(seed=42).slice(0, len(dataset["test"]) // 10)
+=======
+    trainsets = dataset["train"].with_transform(apply_transform)
+    testsets = dataset["test"].with_transform(apply_transform)
+>>>>>>> 09c71c6 (Change the position of model split.)
     return trainsets, testsets
 
 
