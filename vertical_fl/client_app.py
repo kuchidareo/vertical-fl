@@ -21,8 +21,6 @@ class ClientTrashNet(nn.Module):
         self.conv3 = nn.Conv2d(64, 32, kernel_size=3, padding=1)
         self.max_pool3 = nn.MaxPool2d(2, 2)
         self.flatten = nn.Flatten()
-        self.fc1 = nn.Linear(32 * 37 * 37, 64)
-        self.dropout1 = nn.Dropout(0.2)
 
     def forward(self, x):
         x = self.leaky_relu(self.conv1(x))
@@ -35,8 +33,6 @@ class ClientTrashNet(nn.Module):
         x = self.max_pool3(x)
 
         x = self.flatten(x)
-        x = self.leaky_relu(self.fc1(x))
-        x = self.dropout1(x)
         return x
 
 class FlowerClient(NumPyClient):

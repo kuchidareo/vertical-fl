@@ -113,12 +113,12 @@ def load_trashnet():
     dataset = load_dataset("kuchidareo/small_trashnet", split="train[:5%]")
     dataset = dataset.with_format("torch")
 
-    if "test" not in dataset.keys():
+    if isinstance(dataset, Dataset):
+        dataset = dataset.train_test_split(test_size=0.2)
+    else:
         if "train" in dataset.keys():
             dataset = dataset["train"].train_test_split(test_size=0.2)
-        else:
-            dataset = dataset.train_test_split(test_size=0.2)
-    
+            
     image_key = "image"
     label_key = "label"
 
