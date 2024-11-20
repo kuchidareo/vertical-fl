@@ -138,9 +138,8 @@ def load_trashnet():
             return data
         data[image_key] = [transform(img) for img in data[image_key]]
         return data
-
-    trainsets = dataset["train"].with_transform(apply_transform)
-    testsets = dataset["test"].with_transform(apply_transform)
+    trainsets = dataset["train"].with_transform(apply_transform).shuffle(seed=42).slice(0, len(dataset["train"]) // 10)
+    testsets = dataset["test"].with_transform(apply_transform).shuffle(seed=42).slice(0, len(dataset["test"]) // 10)
     return trainsets, testsets
 
 
