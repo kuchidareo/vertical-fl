@@ -110,7 +110,7 @@ def load_data(partition_id: int, num_partitions: int):
     return partition.to_pandas(), v_split_id
 
 def load_trashnet():
-    dataset = load_dataset("kuchidareo/small_trashnet", split="train[:5%]")
+    dataset = load_dataset("kuchidareo/small_trashnet", split="train[:1%]")
     dataset = dataset.with_format("torch")
 
     if isinstance(dataset, Dataset):

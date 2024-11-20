@@ -53,7 +53,7 @@ class FlowerClient(NumPyClient):
         for batch in trainloader:
             data, label = batch["image"], batch["label"]
             embedding = self.model(data)
-            embedding_aggregated = torch.cat((embedding_aggregated, embedding.unsqueeze(0)), dim=0)
+            embedding_aggregated = torch.cat((embedding_aggregated, embedding), dim=0)
 
         return [embedding_aggregated.detach().numpy()], 1, {}
 
