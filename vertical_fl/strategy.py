@@ -9,17 +9,12 @@ class ServerTrashNet(nn.Module):
     """Model from vasantvohra TrashNet: CNN 80% ipynb."""
     def __init__(self, num_devices):
         super(ServerTrashNet, self).__init__()
-        self.fc1 = nn.Linear(32 * 37 * 37 * num_devices, 64)
-        self.dropout1 = nn.Dropout(0.2)
-        self.fc2 = nn.Linear(64, 32)
+        self.fc2 = nn.Linear(64 * num_devices, 32)
         self.dropout2 = nn.Dropout(0.2)
         self.fc3 = nn.Linear(32, 6)
         self.leaky_relu = nn.LeakyReLU()
 
     def forward(self, x):
-        x = self.leaky_relu(self.fc1(x))
-        x = self.dropout1(x)
-
         x = self.leaky_relu(self.fc2(x))
         x = self.dropout2(x)
         
